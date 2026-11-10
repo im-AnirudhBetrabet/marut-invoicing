@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build:invoice": "node scripts/build-invoice-paper.mjs",
+    "build": "npm run build:invoice && tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "@types/react-dom": "^18.3.5",
     "@vercel/node": "^5.1.6",
     "@vitejs/plugin-react": "^4.3.4",
+    "esbuild": "^0.28.2",
     "typescript": "~5.7.2",
     "vite": "^6.0.5"
   },

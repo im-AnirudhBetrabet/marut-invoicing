@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import React from "react";
-import InvoicePaper from "../../src/components/InvoicePaper.tsx";
+import InvoicePaper from "../../server/generated/invoice-paper.js";
 import type { InvoiceState, LineItem } from "../../src/lib/types.ts";
 import { PACKS, PRODUCTS } from "../../src/lib/types.ts";
 import { existsSync } from "node:fs";

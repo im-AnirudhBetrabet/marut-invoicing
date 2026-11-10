@@ -81,7 +81,7 @@ export default function App() {
             <label className="span-two">Billing address<textarea value={data.address} onChange={e => update("address", e.target.value)} placeholder={"Street / locality\nCity, State – PIN, India"} rows={2} /></label>
           </div></div>
           <div className="section-card"><div className="section-heading"><h2><span>03</span> Line items</h2><button className="small-add" onClick={addLine}><Plus size={14} /> Add item</button></div>
-            <div className="item-head"><span>PRODUCT</span><span>PACK</span><span>QTY</span><span>UNIT PRICE (₹)</span><span>DISCOUNT (₹)</span><span>AMOUNT</span><span /></div>
+            <div className="item-head"><span>PRODUCT</span><span>PACK</span><span>QTY</span><span>UNIT PRICE (&#8377;)</span><span>DISCOUNT (&#8377;)</span><span>AMOUNT</span><span /></div>
             {data.items.map(item => <div className="item-row" key={item.id}>
               <select value={item.product} onChange={e => updateLine(item.id, "product", e.target.value)}>{PRODUCTS.map(p => <option key={p}>{p}</option>)}</select>
               <select value={item.pack} onChange={e => updateLine(item.id, "pack", e.target.value)}>{PACKS.map(p => <option key={p}>{p}</option>)}</select>

@@ -24,7 +24,7 @@ export default function InvoicePaper({ data }: { data: InvoiceState }) {
       <div><label>{pro ? "ISSUED BY" : "BILLED BY"}</label><h2>MARUT</h2><p>Annapoorneshwari Nagar<br />Nagarbhavi 2nd Block<br />Bangalore - 560072, Karnataka, India<br />Phone&nbsp;&nbsp; {formatIndianMobile("8296102009")}</p></div>
       <div><label>{pro ? "ISSUED TO" : "BILLED TO"}</label><h2>{data.customer || "Customer name"}</h2><p>{(data.address || "Customer billing address").split("\n").map((s, i) => <span key={i}>{s}<br /></span>)}</p>{data.phone && <p>Phone&nbsp;&nbsp; {formatIndianMobile(data.phone)}</p>}{data.email && <p>Email&nbsp;&nbsp; {data.email}</p>}</div>
     </section>
-    <table className="paper-items"><thead><tr><th>#</th><th>ITEM / DESCRIPTION</th><th>QTY</th><th>UNIT PRICE (&#8377;)</th><th>DISCOUNT (&#8377;)</th><th>AMOUNT (&#8377;)</th></tr></thead><tbody>
+    <table className="paper-items"><thead><tr><th>#</th><th>ITEM / DESCRIPTION</th><th>QTY</th><th>UNIT PRICE (Rs.)</th><th>DISCOUNT (Rs.)</th><th>AMOUNT (Rs.)</th></tr></thead><tbody>
       {data.items.map((x, i) => <tr key={x.id}><td>{i + 1}</td><td>{x.product} ({x.pack})</td><td>{x.qty} pack</td><td>{x.rate.toFixed(2)}</td><td>{Math.min(x.discount, x.qty * x.rate) ? Math.min(x.discount, x.qty * x.rate).toFixed(2) : "—"}</td><td>{Math.max(0, x.qty * x.rate - Math.min(x.discount, x.qty * x.rate)).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td></tr>)}
     </tbody></table>
     <section className="paper-summary">

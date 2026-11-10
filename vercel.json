@@ -30,5 +30,11 @@
     "api/invoice/pdf.ts": {
       "includeFiles": "public/brand/*.webp"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { createHash, timingSafeEqual } from "node:crypto";
-import { cookieHeader, makeSession, requirePost, sessionSecret } from "../../server/session";
+import { cookieHeader, makeSession, requirePost, sessionSecret } from "../../server/session.js";
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   if (!requirePost(req, res)) return;

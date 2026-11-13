@@ -9,10 +9,10 @@ import InvoicePaper from "../../server/generated/invoice-paper.js";
 import { existsSync } from "node:fs";
 const MAX_ITEMS = 100;
 const MAX_BODY_BYTES = 180_000;
-const PAPER = "#F8F5EE";
+const PAPER = "#ffffff";
 export type DocKind = "proforma" | "sales";
 export type Product = "Pak Choi Microgreens" | "Pink Radish Microgreens" | "Purple Radish Microgreens" | "Red Radish Microgreens" | "White Radish Microgreens" | "Broccoli Microgreens" | "Fenugreek Microgreens" | "Pea Shoots Microgreens" | "Sunflower Microgreens" | "Mustard Microgreens";
-export interface LineItem { id: string; product: Product; pack: "50 g" | "100 g" | "250 g" | "500 g"; qty: number; rate: number; discount: number; }
+export interface LineItem { id: string; product: Product; pack: "50 g" | "100 g" | "250 g" | "500 g"; qty: number; rate: number; }
 export interface InvoiceState {
   kind: DocKind; number: string; issueDate: string; validUntil: string; reference: string;
   customer: string; phone: string; email: string; address: string; items: LineItem[];
@@ -55,7 +55,6 @@ function normalizeInvoice(input: unknown): InvoiceState | null {
       pack: row.pack as LineItem["pack"],
       qty: finite(row.qty, 1, 1, 100_000),
       rate: finite(row.rate),
-      discount: finite(row.discount),
     });
   }
   const rawPhone = text(raw.phone, 24);
@@ -160,7 +159,7 @@ const PDF_CSS = `
   .paper-items th:last-child { border-radius: 0 2mm 2mm 0; text-align: right; }
   .paper-items td { padding: 3mm 2mm; border-bottom: 1px solid #ded7ca; vertical-align: top; }
   .paper-items td:last-child { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .paper-items td:nth-child(3), .paper-items td:nth-child(4), .paper-items td:nth-child(5) { white-space: nowrap; }
+  .paper-items td:nth-child(3), .paper-items td:nth-child(4) { white-space: nowrap; }
   .paper-items th,
   .paper-items td {
     break-inside: avoid;
@@ -176,7 +175,6 @@ const PDF_CSS = `
   .paper-totals { padding-left: 1mm; }
   .paper-totals > div { display: flex; justify-content: space-between; gap: 3mm; padding: 3mm 2.5mm; border-bottom: 1px solid #ded7ca; font-size: 7.5pt; }
   .paper-totals b { font-weight: 600; white-space: nowrap; }
-  .paper-totals .paper-discount b { color: #8a6c3e; }
   .paper-totals .paper-grand { background: #e9e5d2; border: 0; border-radius: 2mm; margin-top: 2mm; font-weight: 700; font-size: 10pt; }
   .paper-words { margin-top: 8mm; padding-bottom: 6mm; border-bottom: 1px solid #cfc6b6; break-inside: avoid; page-break-inside: avoid; }
   .paper-words label { color: #8a6c3e; }
@@ -312,7 +310,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           justify-content: space-between;
           font-family: Manrope, sans-serif;
           color: #29271f;
-          background-color: #F8F5EE;
+          background-color: #ffffff;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         ">

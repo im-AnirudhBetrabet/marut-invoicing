@@ -7,7 +7,7 @@ import { PACKS, PRODUCTS } from "./lib/types";
 import { cleanIndianMobile, documentNumber, formatIndianMobile, money, serialFromNumber } from "./lib/money";
 
 const today = () => new Date().toISOString().slice(0, 10);
-const newLine = (): LineItem => ({ id: crypto.randomUUID(), product: PRODUCTS[0], pack: "100 g", qty: 1, rate: 0, discount: 0 });
+const newLine = (): LineItem => ({ id: crypto.randomUUID(), product: PRODUCTS[0], pack: "100 g", qty: 1, rate: 0 });
 const initial = (): InvoiceState => ({ kind: "proforma", number: "", issueDate: today(), validUntil: "", reference: "", customer: "", phone: "", email: "", address: "", items: [newLine()], terms: "", notes: "" });
 type Saved = { id: string; number: string; customer: string; total: number; kind: string; date: string; data: InvoiceState };
 export default function App() {
@@ -21,7 +21,7 @@ export default function App() {
   const [pdfBusy, setPdfBusy] = useState(false);
   const [serialInput, setSerialInput] = useState(() => serialFromNumber(initial().number));
 
-  const subtotal = useMemo(() => data.items.reduce((s, x) => s + Math.max(0, x.qty * x.rate - Math.min(x.discount, x.qty * x.rate)), 0), [data.items]);
+  const subtotal = useMemo(() => data.items.reduce((sum, item) => sum + item.qty * item.rate, 0), [data.items]);
   const update = (key: keyof InvoiceState, value: any) => setData(d => ({ ...d, [key]: value }));
   const setKind = (kind: "proforma" | "sales") => setData(d => ({ ...d, kind, number: documentNumber(kind, d.issueDate, serialInput) }));
   const setIssueDate = (date: string) => setData(d => ({ ...d, issueDate: date, number: documentNumber(d.kind, date, serialInput) }));
@@ -32,7 +32,7 @@ export default function App() {
   const saveSession = () => {
     if (!data.customer.trim() || !data.number.trim() || !data.items.length) { setNotice("Add an invoice sequence, customer and at least one item."); return; }
     if (data.phone && data.phone.length !== 10) { setNotice("Enter a complete 10-digit Indian mobile number, or leave the field blank."); return; }
-    const total = data.items.reduce((s, x) => s + Math.max(0, x.qty * x.rate - Math.min(x.discount, x.qty * x.rate)), 0);
+    const total = data.items.reduce((sum, item) => sum + item.qty * item.rate, 0);
     setSaved(s => [{ id: crypto.randomUUID(), number: data.number, customer: data.customer, total, kind: data.kind, date: data.issueDate, data: structuredClone(data) }, ...s]);
     setNotice("Invoice added to this browser session only.");
   };
@@ -81,17 +81,16 @@ export default function App() {
             <label className="span-two">Billing address<textarea value={data.address} onChange={e => update("address", e.target.value)} placeholder={"Street / locality\nCity, State – PIN, India"} rows={2} /></label>
           </div></div>
           <div className="section-card"><div className="section-heading"><h2><span>03</span> Line items</h2><button className="small-add" onClick={addLine}><Plus size={14} /> Add item</button></div>
-            <div className="item-head"><span>PRODUCT</span><span>PACK</span><span>QTY</span><span>UNIT PRICE (Rs.)</span><span>DISCOUNT (Rs.)</span><span>AMOUNT</span><span /></div>
+            <div className="item-head"><span>PRODUCT</span><span>PACK</span><span>QTY</span><span>UNIT PRICE (Rs.)</span><span>AMOUNT</span><span /></div>
             {data.items.map(item => <div className="item-row" key={item.id}>
               <select value={item.product} onChange={e => updateLine(item.id, "product", e.target.value)}>{PRODUCTS.map(p => <option key={p}>{p}</option>)}</select>
               <select value={item.pack} onChange={e => updateLine(item.id, "pack", e.target.value)}>{PACKS.map(p => <option key={p}>{p}</option>)}</select>
               <input type="number" min="1" value={item.qty} onChange={e => updateLine(item.id, "qty", Math.max(1, Number(e.target.value)))} />
               <input type="number" min="0" step=".01" value={item.rate || ""} placeholder="0.00" onChange={e => updateLine(item.id, "rate", Math.max(0, Number(e.target.value)))} />
-              <input type="number" min="0" step=".01" value={item.discount || ""} placeholder="0.00" onChange={e => updateLine(item.id, "discount", Math.max(0, Number(e.target.value)))} />
-              <b>{money(Math.max(0, item.qty * item.rate - item.discount))}</b>
+              <b>{money(item.qty * item.rate)}</b>
               <button className="remove-item" onClick={() => update("items", data.items.filter(x => x.id !== item.id))} aria-label="Remove item"><Trash2 size={15} /></button>
             </div>)}
-            <div className="items-foot"><span>{data.items.length} line item(s)</span><b>{data.kind === "proforma" ? "Estimated value" : "Amount charged"} <strong>{money(Math.max(0, subtotal))}</strong></b></div>
+            <div className="items-foot"><span>{data.items.length} line item(s)</span><b>{data.kind === "proforma" ? "Estimated total" : "Amount charged"} <strong>{money(subtotal)}</strong></b></div>
           </div>
           <div className="section-card"><h2><span>04</span> Commercial terms & notes</h2><div className="form-grid two">
             <label>Additional terms<textarea rows={2} value={data.terms} onChange={e => update("terms", e.target.value)} placeholder="Delivery schedule, payment terms…" /></label>

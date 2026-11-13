@@ -1,5 +1,5 @@
 // src/components/InvoicePaper.tsx
-import { Clock3, BadgePercent, PackageCheck, CreditCard, ReceiptText, OctagonAlert } from "lucide-react";
+import { Clock3, Info, PackageCheck, CreditCard, ReceiptText, OctagonAlert } from "lucide-react";
 
 // src/lib/money.ts
 var money = (n) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", minimumFractionDigits: 2 }).format(Number.isFinite(n) ? n : 0);
@@ -46,11 +46,7 @@ import { jsx, jsxs } from "react/jsx-runtime";
 var fmt = (d) => d ? new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(/* @__PURE__ */ new Date(`${d}T00:00:00`)) : "\u2014";
 function InvoicePaper({ data }) {
   const subtotal = data.items.reduce((sum, x) => sum + x.qty * x.rate, 0);
-  const totalDiscount = data.items.reduce(
-    (sum, x) => sum + Math.min(x.discount, x.qty * x.rate),
-    0
-  );
-  const total = Math.max(0, subtotal - totalDiscount);
+  const total = subtotal;
   const pro = data.kind === "proforma";
   const title = pro ? "PRO FORMA INVOICE" : "SALES INVOICE";
   return /* @__PURE__ */ jsxs("article", { className: "invoice-paper", id: "invoice-paper", children: [
@@ -124,9 +120,8 @@ function InvoicePaper({ data }) {
         /* @__PURE__ */ jsx("th", { children: "#" }),
         /* @__PURE__ */ jsx("th", { children: "ITEM / DESCRIPTION" }),
         /* @__PURE__ */ jsx("th", { children: "QTY" }),
-        /* @__PURE__ */ jsx("th", { children: "UNIT PRICE (\u20B9)" }),
-        /* @__PURE__ */ jsx("th", { children: "DISCOUNT (\u20B9)" }),
-        /* @__PURE__ */ jsx("th", { children: "AMOUNT (\u20B9)" })
+        /* @__PURE__ */ jsx("th", { children: "UNIT PRICE (Rs.)" }),
+        /* @__PURE__ */ jsx("th", { children: "AMOUNT (Rs.)" })
       ] }) }),
       /* @__PURE__ */ jsx("tbody", { children: data.items.map((x, i) => /* @__PURE__ */ jsxs("tr", { children: [
         /* @__PURE__ */ jsx("td", { children: i + 1 }),
@@ -141,36 +136,22 @@ function InvoicePaper({ data }) {
           " pack"
         ] }),
         /* @__PURE__ */ jsx("td", { children: x.rate.toFixed(2) }),
-        /* @__PURE__ */ jsx("td", { children: Math.min(x.discount, x.qty * x.rate) ? Math.min(x.discount, x.qty * x.rate).toFixed(2) : "\u2014" }),
-        /* @__PURE__ */ jsx("td", { children: Math.max(0, x.qty * x.rate - Math.min(x.discount, x.qty * x.rate)).toLocaleString("en-IN", { minimumFractionDigits: 2 }) })
+        /* @__PURE__ */ jsx("td", { children: (x.qty * x.rate).toLocaleString("en-IN", { minimumFractionDigits: 2 }) })
       ] }, x.id)) })
     ] }),
     /* @__PURE__ */ jsxs("section", { className: "paper-summary", children: [
       /* @__PURE__ */ jsxs("div", { className: "paper-terms", children: [
         /* @__PURE__ */ jsx("label", { children: pro ? "COMMERCIAL TERMS" : "PAYMENT TERMS" }),
-        (pro ? [{ icon: Clock3, text: "Expected supply: Within 7 days" }, { icon: BadgePercent, text: "Prices are indicative and subject to confirmation" }, { icon: PackageCheck, text: "Subject to availability of produce" }, { icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }] : [{ icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }, { icon: ReceiptText, text: "Please quote invoice number with payment" }, { icon: OctagonAlert, text: "Goods once sold will not be taken back. " }]).map(({ icon: Icon, text }, i) => /* @__PURE__ */ jsxs("p", { className: "paper-term-row", children: [
+        (pro ? [{ icon: Clock3, text: "Expected supply: Within 7 days" }, { icon: Info, text: "Prices are indicative and subject to confirmation" }, { icon: PackageCheck, text: "Subject to availability of produce" }, { icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }] : [{ icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }, { icon: ReceiptText, text: "Please quote invoice number with payment" }, { icon: OctagonAlert, text: "Goods once sold will not be taken back. " }]).map(({ icon: Icon, text }, i) => /* @__PURE__ */ jsxs("p", { className: "paper-term-row", children: [
           /* @__PURE__ */ jsx(Icon, { className: "paper-term-icon", size: 14, strokeWidth: 1.7, "aria-hidden": "true" }),
           /* @__PURE__ */ jsx("span", { children: text })
         ] }, i)),
         data.terms && /* @__PURE__ */ jsx("p", { className: "custom-terms", children: data.terms })
       ] }),
-      /* @__PURE__ */ jsxs("div", { className: "paper-totals", children: [
-        /* @__PURE__ */ jsxs("div", { children: [
-          /* @__PURE__ */ jsx("span", { children: pro ? "Estimated value before discount" : "Amount before discount" }),
-          /* @__PURE__ */ jsx("b", { children: money(subtotal) })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "paper-discount", children: [
-          /* @__PURE__ */ jsx("span", { children: "Total discount" }),
-          /* @__PURE__ */ jsxs("b", { children: [
-            "\u2212 ",
-            money(totalDiscount)
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxs("div", { className: "paper-grand", children: [
-          /* @__PURE__ */ jsx("span", { children: pro ? "Estimated total" : "Amount charged" }),
-          /* @__PURE__ */ jsx("strong", { children: money(total) })
-        ] })
-      ] })
+      /* @__PURE__ */ jsx("div", { className: "paper-totals", children: /* @__PURE__ */ jsxs("div", { className: "paper-grand", children: [
+        /* @__PURE__ */ jsx("span", { children: pro ? "Estimated total" : "Amount charged" }),
+        /* @__PURE__ */ jsx("strong", { children: money(total) })
+      ] }) })
     ] }),
     /* @__PURE__ */ jsxs("section", { className: "paper-words", children: [
       /* @__PURE__ */ jsx("label", { children: "AMOUNT IN WORDS" }),

@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
 
 :root {
-    font-family: "Roboto", sans-serif;;
+    font-family: "Manrope", sans-serif;    ;
     color: #282720;
     background: #efede6;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
-    --paper: #f8f5ee;
+    --paper: #ffffff;
     --paper2: #eee9dc;
     --ink: #282720;
     --muted: #777368;
@@ -533,7 +533,7 @@ button:disabled {
 .item-head,
 .item-row {
     display: grid;
-    grid-template-columns: minmax(130px, 1.7fr) 66px 54px 82px 82px 88px 24px;
+    grid-template-columns: minmax(130px, 1.7fr) 66px 54px 82px 88px 24px;
     gap: 7px;
     align-items: center
 }
@@ -657,10 +657,10 @@ button:disabled {
     max-width: 794px;
     min-height: 1123px;
     margin: 0 auto;
-    background: #faf7f0;
+    background: #ffffff;
     color: #29271f;
     padding: 42px 42px 150px;
-    font-family: "Roboto", sans-serif;;
+    font-family: "Manrope", sans-serif;
     box-shadow: 0 4px 18px #332b1d18;
     font-size: 10px
 }
@@ -884,10 +884,6 @@ button:disabled {
 .paper-totals b {
     font-weight: 600;
     white-space: nowrap
-}
-
-.paper-totals .paper-discount b {
-    color: #8a6c3e
 }
 
 .paper-totals .paper-grand {
@@ -1364,7 +1360,7 @@ button:disabled {
 
         @bottom-right {
             content: "Page " counter(page) " of " counter(pages);
-            font-family: "Roboto", sans-serif;;
+            font-family: "Manrope", sans-serif;
             font-size: 8pt;
             color: #716d64;
         }
@@ -1397,7 +1393,7 @@ button:disabled {
         display: block !important;
         position: fixed !important;
         inset: 0 !important;
-        background: #faf7f0 !important;
+        background: #ffffff !important;
         z-index: -1 !important;
         print-color-adjust: exact !important;
         -webkit-print-color-adjust: exact !important

@@ -1,14 +1,10 @@
 import type { InvoiceState } from "../lib/types";
-import { Clock3, BadgePercent, PackageCheck, CreditCard, ReceiptText, OctagonAlert } from "lucide-react";
+import { Clock3, Info, PackageCheck, CreditCard, ReceiptText, OctagonAlert } from "lucide-react";
 import { amountWords, formatIndianMobile, money } from "../lib/money";
 const fmt = (d: string) => d ? new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${d}T00:00:00`)) : "—";
 export default function InvoicePaper({ data }: { data: InvoiceState }) {
   const subtotal = data.items.reduce((sum, x) => sum + (x.qty * x.rate), 0);
-  const totalDiscount = data.items.reduce(
-    (sum, x) => sum + Math.min(x.discount, x.qty * x.rate),
-    0
-  );
-  const total = Math.max(0, subtotal - totalDiscount);
+  const total = subtotal;
   const pro = data.kind === "proforma";
   const title = pro ? "PRO FORMA INVOICE" : "SALES INVOICE";
   return <article className="invoice-paper" id="invoice-paper">
@@ -24,26 +20,18 @@ export default function InvoicePaper({ data }: { data: InvoiceState }) {
       <div><label>{pro ? "ISSUED BY" : "BILLED BY"}</label><h2>MARUT</h2><p>Annapoorneshwari Nagar<br />Nagarbhavi 2nd Block<br />Bangalore - 560072, Karnataka, India<br />Phone&nbsp;&nbsp; {formatIndianMobile("8296102009")}</p></div>
       <div><label>{pro ? "ISSUED TO" : "BILLED TO"}</label><h2>{data.customer || "Customer name"}</h2><p>{(data.address || "Customer billing address").split("\n").map((s, i) => <span key={i}>{s}<br /></span>)}</p>{data.phone && <p>Phone&nbsp;&nbsp; {formatIndianMobile(data.phone)}</p>}{data.email && <p>Email&nbsp;&nbsp; {data.email}</p>}</div>
     </section>
-    <table className="paper-items"><thead><tr><th>#</th><th>ITEM / DESCRIPTION</th><th>QTY</th><th>UNIT PRICE (Rs.)</th><th>DISCOUNT (Rs.)</th><th>AMOUNT (Rs.)</th></tr></thead><tbody>
-      {data.items.map((x, i) => <tr key={x.id}><td>{i + 1}</td><td>{x.product} ({x.pack})</td><td>{x.qty} pack</td><td>{x.rate.toFixed(2)}</td><td>{Math.min(x.discount, x.qty * x.rate) ? Math.min(x.discount, x.qty * x.rate).toFixed(2) : "—"}</td><td>{Math.max(0, x.qty * x.rate - Math.min(x.discount, x.qty * x.rate)).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td></tr>)}
+    <table className="paper-items"><thead><tr><th>#</th><th>ITEM / DESCRIPTION</th><th>QTY</th><th>UNIT PRICE (Rs.)</th><th>AMOUNT (Rs.)</th></tr></thead><tbody>
+      {data.items.map((x, i) => <tr key={x.id}><td>{i + 1}</td><td>{x.product} ({x.pack})</td><td>{x.qty} pack</td><td>{x.rate.toFixed(2)}</td><td>{(x.qty * x.rate).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td></tr>)}
     </tbody></table>
     <section className="paper-summary">
       <div className="paper-terms"><label>{pro ? "COMMERCIAL TERMS" : "PAYMENT TERMS"}</label>
         {(pro
-          ? [{ icon: Clock3, text: "Expected supply: Within 7 days" }, { icon: BadgePercent, text: "Prices are indicative and subject to confirmation" }, { icon: PackageCheck, text: "Subject to availability of produce" }, { icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }]
+          ? [{ icon: Clock3, text: "Expected supply: Within 7 days" }, { icon: Info, text: "Prices are indicative and subject to confirmation" }, { icon: PackageCheck, text: "Subject to availability of produce" }, { icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }]
           : [{ icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }, { icon: ReceiptText, text: "Please quote invoice number with payment" }, { icon: OctagonAlert, text: "Goods once sold will not be taken back. " }]
         ).map(({ icon: Icon, text }, i) => <p className="paper-term-row" key={i}><Icon className="paper-term-icon" size={14} strokeWidth={1.7} aria-hidden="true" /><span>{text}</span></p>)}
         {data.terms && <p className="custom-terms">{data.terms}</p>}
       </div>
       <div className="paper-totals">
-        <div>
-          <span>{pro ? "Estimated value before discount" : "Amount before discount"}</span>
-          <b>{money(subtotal)}</b>
-        </div>
-        <div className="paper-discount">
-          <span>Total discount</span>
-          <b>− {money(totalDiscount)}</b>
-        </div>
         <div className="paper-grand">
           <span>{pro ? "Estimated total" : "Amount charged"}</span>
           <strong>{money(total)}</strong>

@@ -12,13 +12,14 @@ const MAX_BODY_BYTES = 180_000;
 const PAPER = "#ffffff";
 export type DocKind = "proforma" | "sales";
 export type Product = "Pak Choi Microgreens" | "Pink Radish Microgreens" | "Purple Radish Microgreens" | "Red Radish Microgreens" | "White Radish Microgreens" | "Broccoli Microgreens" | "Fenugreek Microgreens" | "Pea Shoots Microgreens" | "Sunflower Microgreens" | "Mustard Microgreens";
+type DeliveryDay = | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
 export interface LineItem { id: string; product: Product; pack: "50 g" | "100 g" | "250 g" | "500 g"; qty: number; rate: number; }
 export interface InvoiceState {
   kind: DocKind; number: string; issueDate: string; validUntil: string; reference: string;
   customer: string; phone: string; email: string; address: string; items: LineItem[];
-  terms: string; notes: string;
+  deliveryDays: DeliveryDay[]; orderConfirmed: boolean; terms: string; notes: string;
 }
-export const PRODUCTS: Product[] = ["Pak Choi Microgreens" , "Pink Radish Microgreens" , "Purple Radish Microgreens" , "Red Radish Microgreens" , "White Radish Microgreens" , "Broccoli Microgreens" , "Fenugreek Microgreens" , "Pea Shoots Microgreens", "Sunflower Microgreens", "Mustard Microgreens"];
+export const PRODUCTS: Product[] = ["Pak Choi Microgreens", "Pink Radish Microgreens", "Purple Radish Microgreens", "Red Radish Microgreens", "White Radish Microgreens", "Broccoli Microgreens", "Fenugreek Microgreens", "Pea Shoots Microgreens", "Sunflower Microgreens", "Mustard Microgreens"];
 export const PACKS: LineItem["pack"][] = ["50 g", "100 g", "250 g", "500 g"];
 function text(value: unknown, max = 500): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -61,6 +62,22 @@ function normalizeInvoice(input: unknown): InvoiceState | null {
   const phoneDigits = rawPhone.replace(/\D/g, "");
   if (rawPhone && phoneDigits.length !== 10) return null;
   const phone = phoneDigits;
+  const allowedDeliveryDays: DeliveryDay[] = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  const deliveryDays: DeliveryDay[] =
+  raw.kind === "proforma" && Array.isArray(raw.deliveryDays)
+    ? allowedDeliveryDays.filter(day =>
+        (raw.deliveryDays as unknown[]).includes(day)
+      )
+    : [];
   return {
     kind: raw.kind,
     number,
@@ -74,6 +91,8 @@ function normalizeInvoice(input: unknown): InvoiceState | null {
     items,
     terms: text(raw.terms, 1000),
     notes: text(raw.notes, 1000),
+    deliveryDays,
+    orderConfirmed: raw.kind === "proforma" && raw.orderConfirmed === true,
   };
 }
 

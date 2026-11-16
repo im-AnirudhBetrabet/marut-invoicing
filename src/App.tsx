@@ -2,14 +2,38 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowDownToLine, FileText, Leaf, LogOut, Plus, ReceiptText, RotateCcw, ShieldCheck, Trash2, X, LockKeyhole } from "lucide-react";
 import Login from "./components/Login";
 import InvoicePaper from "./components/InvoicePaper";
-import type { InvoiceState, LineItem } from "./lib/types";
+import type { InvoiceState, LineItem, DeliveryDay } from "./lib/types";
 import { PACKS, PRODUCTS } from "./lib/types";
 import { cleanIndianMobile, documentNumber, formatIndianMobile, money, serialFromNumber } from "./lib/money";
 
-const today = () => new Date().toISOString().slice(0, 10);
-const newLine = (): LineItem => ({ id: crypto.randomUUID(), product: PRODUCTS[0], pack: "100 g", qty: 1, rate: 0 });
-const initial = (): InvoiceState => ({ kind: "proforma", number: "", issueDate: today(), validUntil: "", reference: "", customer: "", phone: "", email: "", address: "", items: [newLine()], terms: "", notes: "" });
-type Saved = { id: string; number: string; customer: string; total: number; kind: string; date: string; data: InvoiceState };
+const today                        = () => new Date().toISOString().slice(0, 10);
+const newLine                      = (): LineItem => ({ id: crypto.randomUUID(), product: PRODUCTS[0], pack: "100 g", qty: 1, rate: 0 });
+const DELIVERY_DAYS: DeliveryDay[] = [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", ];
+const initial                      = (): InvoiceState => ({
+  kind        : "proforma",
+  number      : "",
+  issueDate   : today(),
+  validUntil  : "",
+  reference   : "",
+  customer    : "",
+  phone       : "",
+  email       : "",
+  address     : "",
+  items       : [newLine()],
+  deliveryDays: [],
+  orderConfirmed: false,
+  terms       : "",
+  notes       : ""
+});
+type Saved                         = { 
+  id      : string; 
+  number  : string; 
+  customer: string; 
+  total   : number; 
+  kind    : string; 
+  date    : string; 
+  data    : InvoiceState 
+};
 export default function App() {
   const [authed, setAuthed] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -56,7 +80,7 @@ export default function App() {
   };
   if (!authChecked) return <main className="auth-loading"><div className="loading-mark">MARUT</div><span>Checking secure session…</span></main>;
   if (!authed) return <Login onLogin={() => setAuthed(true)} />;
-  return <div className="studio-shell">
+  return (<div className="studio-shell">
     <aside className="sidebar">
       <div className="sidebar-brand"><img src="/brand/marut-logo-gold.png" alt="MARUT" /><span>INVOICE STUDIO</span></div>
       <nav><button className={page === "create" ? "active" : ""} onClick={() => setPage("create")}><Plus />Create Invoice</button><button className={page === "session" ? "active" : ""} onClick={() => setPage("session")}><FileText />Invoices (Session)<em>{saved.length}</em></button><button className={page === "settings" ? "active" : ""} onClick={() => setPage("settings")}><ShieldCheck />Security & Info</button></nav>
@@ -74,13 +98,68 @@ export default function App() {
             <label>{data.kind === "proforma" ? "Valid until" : "Payment due"}<input type="date" value={data.validUntil} onChange={e => update("validUntil", e.target.value)} /></label>
             <label>Reference<input value={data.reference} onChange={e => update("reference", e.target.value)} placeholder="Order / PO reference" /></label>
           </div></div>
-          <div className="section-card"><h2><span>02</span> Customer details</h2><div className="form-grid two">
+          {data.kind === "proforma" && (
+            <div className="section-card">
+              <h2><span>02</span> Delivery schedule</h2>
+
+              <p className="field-hint">
+                Select all days on which deliveries are planned.
+              </p>
+
+              <div className="delivery-days-grid">
+                {DELIVERY_DAYS.map(day => {
+                  const selected = data.deliveryDays.includes(day);
+
+                  return (
+                    <label
+                      key={day}
+                      className={`delivery-day-option ${selected ? "selected" : ""}`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={e => {
+                          const next = e.target.checked
+                            ? [...data.deliveryDays, day]
+                            : data.deliveryDays.filter(d => d !== day);
+
+                          update("deliveryDays", next);
+                        }}
+                      />
+                      <span>{day}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {data.kind === "proforma" && (
+            <div className="section-card">
+              <h2><span>03</span> Order confirmation</h2>
+              <label className={`order-confirmation-toggle ${data.orderConfirmed ? "selected" : ""}`}>
+                <input
+                  type="checkbox"
+                  checked={data.orderConfirmed}
+                  onChange={e => update("orderConfirmed", e.target.checked)}
+                />
+                <span className="toggle-copy">
+                  <strong>Show order confirmed message</strong>
+                  <small>Display the germination update on the Pro Forma PDF.</small>
+                </span>
+                <span className="toggle-switch" aria-hidden="true"><span /></span>
+              </label>
+              <p className="order-confirmation-preview">
+                “Order Confirmed: Your seeds are now soaking and officially entering germination for a fresh, made-to-order harvest.”
+              </p>
+            </div>
+          )}
+          <div className="section-card"><h2><span>04</span> Customer details</h2><div className="form-grid two">
             <label>Customer / business name *<input value={data.customer} onChange={e => update("customer", e.target.value)} placeholder="Customer name" /></label>
             <label>Mobile number<input type="tel" inputMode="numeric" maxLength={14} value={data.phone} onChange={e => update("phone", cleanIndianMobile(e.target.value))} placeholder="10-digit mobile number" /><small className="field-hint">Displayed as {formatIndianMobile(data.phone) || "+(91) XXXXX XXXXX"}</small></label>
             <label>Email<input type="email" value={data.email} onChange={e => update("email", e.target.value)} placeholder="customer@example.com" /></label>
             <label className="span-two">Billing address<textarea value={data.address} onChange={e => update("address", e.target.value)} placeholder={"Street / locality\nCity, State – PIN, India"} rows={2} /></label>
           </div></div>
-          <div className="section-card"><div className="section-heading"><h2><span>03</span> Line items</h2><button className="small-add" onClick={addLine}><Plus size={14} /> Add item</button></div>
+          <div className="section-card"><div className="section-heading"><h2><span>05</span> Line items</h2><button className="small-add" onClick={addLine}><Plus size={14} /> Add item</button></div>
             <div className="item-head"><span>PRODUCT</span><span>PACK</span><span>QTY</span><span>UNIT PRICE (Rs.)</span><span>AMOUNT</span><span /></div>
             {data.items.map(item => <div className="item-row" key={item.id}>
               <select value={item.product} onChange={e => updateLine(item.id, "product", e.target.value)}>{PRODUCTS.map(p => <option key={p}>{p}</option>)}</select>
@@ -92,7 +171,7 @@ export default function App() {
             </div>)}
             <div className="items-foot"><span>{data.items.length} line item(s)</span><b>{data.kind === "proforma" ? "Estimated total" : "Amount charged"} <strong>{money(subtotal)}</strong></b></div>
           </div>
-          <div className="section-card"><h2><span>04</span> Commercial terms & notes</h2><div className="form-grid two">
+          <div className="section-card"><h2><span>06</span> Commercial terms & notes</h2><div className="form-grid two">
             <label>Additional terms<textarea rows={2} value={data.terms} onChange={e => update("terms", e.target.value)} placeholder="Delivery schedule, payment terms…" /></label>
             <label>Customer note<textarea rows={2} value={data.notes} onChange={e => update("notes", e.target.value)} placeholder="Optional note printed on the document" /></label>
           </div></div>
@@ -103,5 +182,5 @@ export default function App() {
       {page === "session" && <section className="section-card session-list"><h2>Invoices in this session</h2>{saved.length === 0 ? <div className="empty-state"><FileText size={32} /><h3>No session invoices yet</h3><p>Use “Save to session” to keep a temporary copy until you log out or close the tab.</p><button className="primary-button" onClick={() => setPage("create")}>Create an invoice</button></div> : saved.map(x => <div className="saved-row" key={x.id}><div><b>{x.number}</b><span>{x.customer} · {x.date}</span></div><strong>{money(x.total)}</strong><button className="secondary-button" onClick={() => { setData(structuredClone(x.data)); setSerialInput(serialFromNumber(x.data.number)); setPage("create"); }}>Open</button></div>)}</section>}
       {page === "settings" && <section className="section-card info-card"><h2>Privacy & security</h2><div className="info-row"><ShieldCheck /><div><b>Server-verified password</b><p>The password is stored only as a Vercel environment variable and is never shipped to the browser.</p></div></div><div className="info-row"><LockKeyhole /><div><b>Signed session cookie</b><p>HTTP-only, Secure, SameSite=Strict cookie. Session expires after 8 hours.</p></div></div><div className="info-row"><FileText /><div><b>No database or cloud invoice storage</b><p>Invoice details stay in memory. Saved session invoices disappear when you log out or close the tab.</p></div></div><div className="info-row"><ReceiptText /><div><b>Non-GST commercial invoices</b><p>Pro Forma and Sales Invoice documents are available. GST is not calculated or collected. Confirm MARUT's registration obligations and invoice wording with its CA.</p></div></div><div className="info-row"><ArrowDownToLine /><div><b>Server-generated PDF</b><p>Playwright renders the invoice on the server as an A4 PDF. Browser timestamps, application titles and print-dialog headers are never included.</p></div></div></section>}
     </main>
-  </div>;
+  </div>);
 }

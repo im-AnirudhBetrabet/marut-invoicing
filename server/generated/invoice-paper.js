@@ -1,5 +1,5 @@
 // src/components/InvoicePaper.tsx
-import { Clock3, Info, PackageCheck, CreditCard, ReceiptText, OctagonAlert } from "lucide-react";
+import { Clock3, Info, PackageCheck, CreditCard, ReceiptText, OctagonAlert, CalendarDays, Sprout } from "lucide-react";
 
 // src/lib/money.ts
 var money = (n) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", minimumFractionDigits: 2 }).format(Number.isFinite(n) ? n : 0);
@@ -44,6 +44,7 @@ function formatIndianMobile(value) {
 // src/components/InvoicePaper.tsx
 import { jsx, jsxs } from "react/jsx-runtime";
 var fmt = (d) => d ? new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(/* @__PURE__ */ new Date(`${d}T00:00:00`)) : "\u2014";
+var DELIVERY_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 function InvoicePaper({ data }) {
   const subtotal = data.items.reduce((sum, x) => sum + x.qty * x.rate, 0);
   const total = subtotal;
@@ -146,7 +147,32 @@ function InvoicePaper({ data }) {
           /* @__PURE__ */ jsx(Icon, { className: "paper-term-icon", size: 14, strokeWidth: 1.7, "aria-hidden": "true" }),
           /* @__PURE__ */ jsx("span", { children: text })
         ] }, i)),
-        data.terms && /* @__PURE__ */ jsx("p", { className: "custom-terms", children: data.terms })
+        data.terms && /* @__PURE__ */ jsx("p", { className: "custom-terms", children: data.terms }),
+        pro && /* @__PURE__ */ jsxs("p", { className: "paper-term-row", children: [
+          /* @__PURE__ */ jsx(
+            CalendarDays,
+            {
+              className: "paper-term-icon",
+              size: 14,
+              strokeWidth: 1.7,
+              "aria-hidden": "true"
+            }
+          ),
+          /* @__PURE__ */ jsxs("span", { children: [
+            /* @__PURE__ */ jsx("strong", { children: "Delivery days:" }),
+            " ",
+            data.deliveryDays.length > 0 ? DELIVERY_DAYS.filter((day) => data.deliveryDays.includes(day)).join(", ") : "To be confirmed"
+          ] })
+        ] }),
+        pro && data.orderConfirmed && /* @__PURE__ */ jsxs("p", { className: "paper-term-row", children: [
+          /* @__PURE__ */ jsx(Sprout, { className: "paper-term-icon", size: 14, strokeWidth: 1.7, "aria-hidden": "true" }),
+          /* @__PURE__ */ jsxs("span", { children: [
+            /* @__PURE__ */ jsx("strong", { children: "Order Confirmed:" }),
+            " ",
+            " ",
+            "Your seeds are now soaking and officially entering germination for a fresh, made-to-order harvest."
+          ] })
+        ] })
       ] }),
       /* @__PURE__ */ jsx("div", { className: "paper-totals", children: /* @__PURE__ */ jsxs("div", { className: "paper-grand", children: [
         /* @__PURE__ */ jsx("span", { children: pro ? "Estimated total" : "Amount charged" }),

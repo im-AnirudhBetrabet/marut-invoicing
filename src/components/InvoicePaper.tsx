@@ -1,7 +1,8 @@
-import type { InvoiceState } from "../lib/types";
-import { Clock3, Info, PackageCheck, CreditCard, ReceiptText, OctagonAlert } from "lucide-react";
+import type { InvoiceState, DeliveryDay } from "../lib/types";
+import { Clock3, Info, PackageCheck, CreditCard, ReceiptText, OctagonAlert, CalendarDays, Sprout } from "lucide-react";
 import { amountWords, formatIndianMobile, money } from "../lib/money";
 const fmt = (d: string) => d ? new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(`${d}T00:00:00`)) : "—";
+const DELIVERY_DAYS: DeliveryDay[] = [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", ];
 export default function InvoicePaper({ data }: { data: InvoiceState }) {
   const subtotal = data.items.reduce((sum, x) => sum + (x.qty * x.rate), 0);
   const total = subtotal;
@@ -30,6 +31,32 @@ export default function InvoicePaper({ data }: { data: InvoiceState }) {
           : [{ icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }, { icon: ReceiptText, text: "Please quote invoice number with payment" }, { icon: OctagonAlert, text: "Goods once sold will not be taken back. " }]
         ).map(({ icon: Icon, text }, i) => <p className="paper-term-row" key={i}><Icon className="paper-term-icon" size={14} strokeWidth={1.7} aria-hidden="true" /><span>{text}</span></p>)}
         {data.terms && <p className="custom-terms">{data.terms}</p>}
+        {pro && (
+        <p className="paper-term-row">
+          <CalendarDays
+            className="paper-term-icon"
+            size={14}
+            strokeWidth={1.7}
+            aria-hidden="true"
+          />
+          <span>
+            <strong>Delivery days:</strong>{" "}
+            {data.deliveryDays.length > 0
+              ? DELIVERY_DAYS
+                  .filter(day => data.deliveryDays.includes(day))
+                  .join(", ")
+              : "To be confirmed"}
+          </span>
+        </p>
+      )}
+      {pro && data.orderConfirmed && (
+        <p className="paper-term-row">
+          <Sprout className="paper-term-icon" size={14} strokeWidth={1.7} aria-hidden="true" />
+          <span>
+            <strong>Order Confirmed:</strong> {" "}Your seeds are now soaking and officially entering germination for a fresh, made-to-order harvest.
+          </span>
+        </p>
+      )}
       </div>
       <div className="paper-totals">
         <div className="paper-grand">

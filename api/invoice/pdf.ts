@@ -11,7 +11,8 @@ const MAX_ITEMS = 100;
 const MAX_BODY_BYTES = 180_000;
 const PAPER = "#ffffff";
 export type DocKind = "proforma" | "sales";
-export type Product = "Pak Choi Microgreens" | "Pink Radish Microgreens" | "Purple Radish Microgreens" | "Red Radish Microgreens" | "White Radish Microgreens" | "Broccoli Microgreens" | "Fenugreek Microgreens" | "Pea Shoots Microgreens" | "Sunflower Microgreens" | "Mustard Microgreens";
+export type Product                    = "Pak Choi Microgreens" | "Pink Radish Microgreens" | "Purple Radish Microgreens" | "Red Radish Microgreens" | "White Radish Microgreens" | "Broccoli Microgreens" | "Fenugreek Microgreens" | "Pea Shoots Microgreens" | "Sunflower Microgreens" | "Mustard Microgreens" | "Mixed Microgreens" | "Green Moong dal Sprouts" | "Black Channa Sprouts" | "Horsegram Sprouts" | "Black Eyed Pea Sprouts" | "Green Pea Sprouts" | "Fenugreek Sprouts" | "Mixed Sprouts";
+export const PRODUCTS: Product[]       = ["Pak Choi Microgreens" , "Pink Radish Microgreens" , "Purple Radish Microgreens" , "Red Radish Microgreens" , "White Radish Microgreens" , "Broccoli Microgreens" , "Fenugreek Microgreens" , "Pea Shoots Microgreens", "Sunflower Microgreens", "Mustard Microgreens", "Mixed Microgreens", "Green Moong dal Sprouts", "Black Channa Sprouts", "Horsegram Sprouts", "Black Eyed Pea Sprouts", "Green Pea Sprouts", "Fenugreek Sprouts", "Mixed Sprouts"];
 type DeliveryDay = | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
 export interface LineItem { id: string; product: Product; pack: "50 g" | "100 g" | "250 g" | "500 g"; qty: number; rate: number; }
 export interface InvoiceState {
@@ -19,7 +20,7 @@ export interface InvoiceState {
   customer: string; phone: string; email: string; address: string; items: LineItem[];
   deliveryDays: DeliveryDay[]; orderConfirmed: boolean; terms: string; notes: string;
 }
-export const PRODUCTS: Product[] = ["Pak Choi Microgreens", "Pink Radish Microgreens", "Purple Radish Microgreens", "Red Radish Microgreens", "White Radish Microgreens", "Broccoli Microgreens", "Fenugreek Microgreens", "Pea Shoots Microgreens", "Sunflower Microgreens", "Mustard Microgreens"];
+
 export const PACKS: LineItem["pack"][] = ["50 g", "100 g", "250 g", "500 g"];
 function text(value: unknown, max = 500): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";

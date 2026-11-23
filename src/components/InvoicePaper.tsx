@@ -60,7 +60,7 @@ export default function InvoicePaper({ data }: { data: InvoiceState }) {
       </div>
       <div className="paper-totals">
         <div className="paper-grand">
-          <span>{pro ? "Estimated total" : "Amount charged"}</span>
+          <span>{pro ? "Estimated total (Rs.)" : "Amount charged (Rs.)"}</span>
           <strong>{money(total)}</strong>
         </div>
       </div>

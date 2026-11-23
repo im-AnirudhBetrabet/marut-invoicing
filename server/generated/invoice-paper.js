@@ -175,7 +175,7 @@ function InvoicePaper({ data }) {
         ] })
       ] }),
       /* @__PURE__ */ jsx("div", { className: "paper-totals", children: /* @__PURE__ */ jsxs("div", { className: "paper-grand", children: [
-        /* @__PURE__ */ jsx("span", { children: pro ? "Estimated total" : "Amount charged" }),
+        /* @__PURE__ */ jsx("span", { children: pro ? "Estimated total (Rs.)" : "Amount charged (Rs.)" }),
         /* @__PURE__ */ jsx("strong", { children: money(total) })
       ] }) })
     ] }),

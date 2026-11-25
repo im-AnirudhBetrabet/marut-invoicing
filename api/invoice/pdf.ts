@@ -17,7 +17,7 @@ type DeliveryDay = | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" 
 export interface LineItem { id: string; product: Product; pack: "50 g" | "100 g" | "250 g" | "500 g"; qty: number; rate: number; }
 export interface InvoiceState {
   kind: DocKind; number: string; issueDate: string; validUntil: string; reference: string;
-  customer: string; phone: string; email: string; address: string; items: LineItem[];
+  customer: string; customerGstin: string; showGstin: boolean; gstin: string; phone: string; email: string; address: string; items: LineItem[];
   deliveryDays: DeliveryDay[]; orderConfirmed: boolean; terms: string; notes: string;
 }
 
@@ -86,6 +86,9 @@ function normalizeInvoice(input: unknown): InvoiceState | null {
     validUntil: validDate(raw.validUntil),
     reference: text(raw.reference, 120),
     customer: text(raw.customer, 200),
+    customerGstin: text(raw.customerGstin, 15).toUpperCase().replace(/\s/g, ""),
+    showGstin: raw.showGstin === true,
+    gstin: text(raw.gstin, 15).toUpperCase().replace(/\s/g, ""),
     phone,
     email: text(raw.email, 200),
     address: text(raw.address, 1000),
@@ -187,7 +190,7 @@ const PDF_CSS = `
   .paper-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; margin-top: 10mm; break-inside: avoid; page-break-inside: avoid; }
   .paper-terms { border-right: 1px solid #d1c8b8; padding-right: 5mm; }
   .paper-terms label { display: block; margin-bottom: 3mm; }
-  .paper-terms p { display: flex; gap: 3mm; align-items: flex-start; font-size: 7pt; line-height: 1.4; margin: 2.5mm 0; }
+  .paper-terms p { display: flex; gap: 1.5mm; align-items: flex-start; font-size: 7pt; line-height: 1.4; margin: 2.5mm 0; }
   .paper-term-row { display:flex; align-items:flex-start; gap:3mm; }
   .paper-term-icon { flex:0 0 3.7mm; width:3.7mm; height:3.7mm; color:#a47b3f; stroke-width:1.7; }
   .paper-term-row span { color:#39372f; }
@@ -196,7 +199,7 @@ const PDF_CSS = `
   .paper-totals > div { display: flex; justify-content: space-between; gap: 3mm; padding: 3mm 2.5mm; border-bottom: 1px solid #ded7ca; font-size: 7.5pt; }
   .paper-totals b { font-weight: 600; white-space: nowrap; }
   .paper-totals .paper-grand { background: #e9e5d2; border: 0; border-radius: 2mm; margin-top: 2mm; font-weight: 700; font-size: 10pt; }
-  .paper-words { margin-top: 8mm; padding-bottom: 6mm; border-bottom: 1px solid #cfc6b6; break-inside: avoid; page-break-inside: avoid; }
+  .paper-words { margin-top: 8mm; padding-bottom: 6mm; break-inside: avoid; page-break-inside: avoid; }
   .paper-words label { color: #8a6c3e; }
   .paper-words p { font: italic 10pt Georgia, serif; margin: 2mm 0 0; }
   .paper-footer { display: grid; grid-template-columns: 1.05fr .95fr; gap: 6mm; padding-top: 7mm; break-inside: avoid; page-break-inside: avoid; }

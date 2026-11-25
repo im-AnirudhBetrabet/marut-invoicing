@@ -1,5 +1,5 @@
 // src/components/InvoicePaper.tsx
-import { Clock3, Info, PackageCheck, CreditCard, ReceiptText, OctagonAlert, CalendarDays, Sprout } from "lucide-react";
+import { Clock3, Info, CreditCard, ReceiptText, OctagonAlert, CalendarDays, Sprout } from "lucide-react";
 
 // src/lib/money.ts
 var money = (n) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", minimumFractionDigits: 2 }).format(Number.isFinite(n) ? n : 0);
@@ -97,6 +97,10 @@ function InvoicePaper({ data }) {
           /* @__PURE__ */ jsx("br", {}),
           "Phone\xA0\xA0 ",
           formatIndianMobile("8296102009")
+        ] }),
+        data.showGstin && data.gstin && /* @__PURE__ */ jsxs("p", { children: [
+          /* @__PURE__ */ jsx("strong", { children: "GSTIN\xA0\xA0" }),
+          data.gstin
         ] })
       ] }),
       /* @__PURE__ */ jsxs("div", { children: [
@@ -106,6 +110,10 @@ function InvoicePaper({ data }) {
           s,
           /* @__PURE__ */ jsx("br", {})
         ] }, i)) }),
+        data.customerGstin && /* @__PURE__ */ jsxs("p", { children: [
+          /* @__PURE__ */ jsx("strong", { children: "GSTIN\xA0\xA0" }),
+          data.customerGstin
+        ] }),
         data.phone && /* @__PURE__ */ jsxs("p", { children: [
           "Phone\xA0\xA0 ",
           formatIndianMobile(data.phone)
@@ -143,7 +151,7 @@ function InvoicePaper({ data }) {
     /* @__PURE__ */ jsxs("section", { className: "paper-summary", children: [
       /* @__PURE__ */ jsxs("div", { className: "paper-terms", children: [
         /* @__PURE__ */ jsx("label", { children: pro ? "COMMERCIAL TERMS" : "PAYMENT TERMS" }),
-        (pro ? [{ icon: Clock3, text: "Expected supply: Within 7 days" }, { icon: Info, text: "Prices are indicative and subject to confirmation" }, { icon: PackageCheck, text: "Subject to availability of produce" }, { icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }] : [{ icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }, { icon: ReceiptText, text: "Please quote invoice number with payment" }, { icon: OctagonAlert, text: "Goods once sold will not be taken back. " }]).map(({ icon: Icon, text }, i) => /* @__PURE__ */ jsxs("p", { className: "paper-term-row", children: [
+        (pro ? [{ icon: Clock3, text: "Expected supply: Within 7 days" }, { icon: Info, text: "Prices are indicative and subject to confirmation" }, { icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }] : [{ icon: CreditCard, text: "Payment: UPI / Bank Transfer / Cash" }, { icon: ReceiptText, text: "Please quote invoice number with payment" }, { icon: OctagonAlert, text: "Goods once sold will not be taken back. " }]).map(({ icon: Icon, text }, i) => /* @__PURE__ */ jsxs("p", { className: "paper-term-row", children: [
           /* @__PURE__ */ jsx(Icon, { className: "paper-term-icon", size: 14, strokeWidth: 1.7, "aria-hidden": "true" }),
           /* @__PURE__ */ jsx("span", { children: text })
         ] }, i)),
@@ -174,14 +182,16 @@ function InvoicePaper({ data }) {
           ] })
         ] })
       ] }),
-      /* @__PURE__ */ jsx("div", { className: "paper-totals", children: /* @__PURE__ */ jsxs("div", { className: "paper-grand", children: [
-        /* @__PURE__ */ jsx("span", { children: pro ? "Estimated total (Rs.)" : "Amount charged (Rs.)" }),
-        /* @__PURE__ */ jsx("strong", { children: money(total) })
-      ] }) })
-    ] }),
-    /* @__PURE__ */ jsxs("section", { className: "paper-words", children: [
-      /* @__PURE__ */ jsx("label", { children: "AMOUNT IN WORDS" }),
-      /* @__PURE__ */ jsx("p", { children: amountWords(total) })
+      /* @__PURE__ */ jsxs("div", { className: "paper-totals", children: [
+        /* @__PURE__ */ jsxs("div", { className: "paper-grand", children: [
+          /* @__PURE__ */ jsx("span", { children: pro ? "Estimated total (Rs.)" : "Amount charged (Rs.)" }),
+          /* @__PURE__ */ jsx("strong", { children: money(total) })
+        ] }),
+        /* @__PURE__ */ jsxs("section", { className: "paper-words", children: [
+          /* @__PURE__ */ jsx("label", { children: "AMOUNT IN WORDS" }),
+          /* @__PURE__ */ jsx("p", { children: amountWords(total) })
+        ] })
+      ] })
     ] }),
     /* @__PURE__ */ jsxs("footer", { className: "paper-footer", children: [
       /* @__PURE__ */ jsxs("div", { children: [

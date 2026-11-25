@@ -17,6 +17,9 @@ export interface InvoiceState {
   validUntil    : string; 
   reference     : string;
   customer      : string; 
+  customerGstin : string;
+  showGstin     : boolean;
+  gstin         : string;
   phone         : string; 
   email         : string; 
   address       : string; 

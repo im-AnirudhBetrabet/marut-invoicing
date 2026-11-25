@@ -896,9 +896,8 @@ button:disabled {
 }
 
 .paper-words {
-    margin-top: 36px;
-    padding-bottom: 22px;
-    border-bottom: 1px solid #cfc6b6
+    margin-top: 12px;
+    padding: 0 2px;
 }
 
 .paper-words label {
@@ -906,8 +905,9 @@ button:disabled {
 }
 
 .paper-words p {
-    font: italic 12px Georgia, serif;
-    margin: 8px 0 0
+    font: italic 11px Georgia, serif;
+    line-height: 1.45;
+    margin: 6px 0 0;
 }
 
 .paper-footer {
@@ -950,7 +950,7 @@ button:disabled {
     bottom: 0;
 
     width: 100%;
-    height: 135px;
+    height: 125px;
 
     object-fit: cover;
     object-position: center bottom;
@@ -1566,7 +1566,7 @@ button:disabled {
         height: 27mm !important;
         object-fit: contain !important;
         object-position: right bottom !important;
-        margin: 4mm 0 0 auto !important;
+        margin: 1mm 0 0 auto !important;
         opacity: .95 !important;
         print-color-adjust: exact !important;
         -webkit-print-color-adjust: exact !important
@@ -1726,3 +1726,8 @@ button:disabled {
   font-size: 12px;
   line-height: 1.6;
 }
+
+
+/* Optional MARUT GSTIN display */
+.gstin-input-label { display: flex; flex-direction: column; gap: 7px; margin-top: 14px; }
+.gstin-input-label input { width: 100%; }

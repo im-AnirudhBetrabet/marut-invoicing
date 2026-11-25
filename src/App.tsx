@@ -16,6 +16,9 @@ const initial                      = (): InvoiceState => ({
   validUntil  : "",
   reference   : "",
   customer    : "",
+  customerGstin: "",
+  showGstin: false,
+  gstin: "",
   phone       : "",
   email       : "",
   address     : "",
@@ -153,8 +156,21 @@ export default function App() {
               </p>
             </div>
           )}
+          <div className="section-card">
+            <h2><span>03</span> MARUT GSTIN display <small className="field-hint">Optional · No GST will be calculated or added</small></h2>
+            <label className={`order-confirmation-toggle ${data.showGstin ? "selected" : ""}`}>
+              <input type="checkbox" checked={data.showGstin} onChange={e => update("showGstin", e.target.checked)} />
+              <span className="toggle-copy"><strong>Show MARUT GSTIN on invoice</strong><small>Display your GST identification number in the seller details.</small></span>
+              <span className="toggle-switch" aria-hidden="true"><span /></span>
+            </label>
+            {data.showGstin && <label className="gstin-input-label">MARUT GSTIN
+              <input value={data.gstin} onChange={e => update("gstin", e.target.value.toUpperCase().replace(/\s/g, "").slice(0, 15))} placeholder="15-character GSTIN" maxLength={15} autoCapitalize="characters" />
+              <small className="field-hint">Only the GSTIN is displayed. No tax is calculated or collected.</small>
+            </label>}
+          </div>
           <div className="section-card"><h2><span>04</span> Customer details</h2><div className="form-grid two">
             <label>Customer / business name *<input value={data.customer} onChange={e => update("customer", e.target.value)} placeholder="Customer name" /></label>
+            <label>Customer GSTIN (optional)<input value={data.customerGstin} onChange={e => update("customerGstin", e.target.value.toUpperCase().replace(/\s/g, "").slice(0, 15))} placeholder="15-character GSTIN" maxLength={15} autoCapitalize="characters" /></label>
             <label>Mobile number<input type="tel" inputMode="numeric" maxLength={14} value={data.phone} onChange={e => update("phone", cleanIndianMobile(e.target.value))} placeholder="10-digit mobile number" /><small className="field-hint">Displayed as {formatIndianMobile(data.phone) || "+(91) XXXXX XXXXX"}</small></label>
             <label>Email<input type="email" value={data.email} onChange={e => update("email", e.target.value)} placeholder="customer@example.com" /></label>
             <label className="span-two">Billing address<textarea value={data.address} onChange={e => update("address", e.target.value)} placeholder={"Street / locality\nCity, State – PIN, India"} rows={2} /></label>
